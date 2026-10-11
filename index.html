@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banco Curricular — Israel Silva</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --nd:#0A1B33;--nm:#122A4D;--nc:#16335C;
+  --go:#D4A537;--gs:#E8C468;--ow:#F6F3EA;
+  --tm:#8FA0BD;--td:#5E7196;
+  --ok:#5FAE8D;--wr:#E0B450;--er:#D17068;
+  --br:rgba(212,165,55,0.18);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--nd);font-family:'Poppins',sans-serif;color:var(--ow);min-height:100vh;padding-bottom:80px;}
+
+/* HEADER */
+.hdr{padding:22px 18px 14px;text-align:center;background:linear-gradient(180deg,rgba(22,51,92,0.6),transparent);}
+.hdr-eye{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--go);font-weight:600;}
+.hdr-title{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;color:var(--ow);margin-top:3px;}
+.hdr-sub{font-size:11.5px;color:var(--tm);margin-top:4px;}
+.hdr-stats{display:flex;justify-content:center;gap:18px;margin-top:10px;}
+.hdr-stat{text-align:center;}
+.hdr-stat-n{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--gs);}
+.hdr-stat-l{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--td);}
+.hz{height:1px;background:linear-gradient(90deg,transparent,var(--go) 50%,transparent);margin:0 18px;opacity:.4;}
+
+/* RECENTLY COPIED */
+.rc-wrap{padding:12px 18px 0;}
+.rc-label{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--td);font-weight:600;margin-bottom:7px;}
+.rc-row{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
+.rc-row::-webkit-scrollbar{display:none;}
+.rc-chip{flex-shrink:0;background:var(--nm);border:1px solid var(--br);border-radius:20px;padding:5px 11px;font-size:11px;color:var(--tm);cursor:pointer;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rc-chip:active{background:var(--nc);}
+
+/* SEARCH */
+.sw{padding:10px 18px 0;}
+.si{width:100%;background:var(--nm);border:1px solid var(--br);color:var(--ow);font-family:'Poppins',sans-serif;font-size:13px;padding:9px 14px;border-radius:9px;outline:none;}
+.si:focus{border-color:var(--go);}
+.si::placeholder{color:var(--td);}
+
+/* TABS */
+.tabs{display:flex;overflow-x:auto;gap:0;padding:12px 18px 0;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{flex-shrink:0;padding:7px 13px;font-size:11px;font-weight:600;color:var(--td);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;}
+.tab.active{color:var(--gs);border-color:var(--go);}
+
+/* SECTION */
+.sec{display:none;padding:14px 18px 0;}
+.sec.active{display:block;}
+.sec-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--ow);margin-bottom:8px;}
+.tip{background:rgba(212,165,55,0.07);border-left:3px solid var(--go);border-radius:0 8px 8px 0;padding:9px 12px;margin-bottom:10px;font-size:11px;color:var(--tm);line-height:1.5;}
+
+/* GROUP HEADER */
+.ghdr{background:linear-gradient(135deg,var(--nc),var(--nm));border:1px solid var(--br);border-left:3px solid var(--go);border-radius:10px;padding:11px 12px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.ghdr-info .gtitle{font-family:'Playfair Display',serif;font-size:14.5px;font-weight:700;color:var(--ow);}
+.ghdr-info .gsub{font-size:11px;color:var(--gs);margin-top:1px;}
+.ghdr-info .gmeta{font-size:10.5px;color:var(--tm);margin-top:1px;}
+.ghdr-actions{display:flex;gap:5px;flex-shrink:0;}
+
+/* FIELD CARD */
+.fcard{background:var(--nm);border:1px solid var(--br);border-radius:10px;padding:11px 12px;margin-bottom:7px;}
+.fcard.pinned{border-color:rgba(212,165,55,0.5);background:rgba(18,42,77,0.95);}
+.fcard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.fcard-left{flex:1;min-width:0;}
+.flabel{font-size:9.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--td);font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:5px;}
+.pin-star{color:var(--go);font-size:10px;}
+.fval{font-size:12.5px;color:var(--ow);line-height:1.5;white-space:pre-wrap;word-break:break-word;}
+.fcard-btns{display:flex;gap:5px;margin-top:9px;align-items:center;}
+.cbtn{flex:1;background:rgba(212,165,55,0.13);border:1px solid rgba(212,165,55,0.28);color:var(--gs);font-family:'Poppins',sans-serif;font-size:11px;font-weight:600;padding:6px 0;border-radius:7px;cursor:pointer;text-align:center;}
+.cbtn.copied{background:rgba(95,174,141,0.18);border-color:rgba(95,174,141,0.4);color:var(--ok);}
+.fchars{font-size:10px;color:var(--td);align-self:center;}
+
+/* MENU BUTTON */
+.mbtn{background:rgba(255,255,255,0.05);border:1px solid var(--br);color:var(--tm);font-size:15px;padding:4px 8px;border-radius:7px;cursor:pointer;line-height:1;flex-shrink:0;}
+.mbtn:active{background:rgba(255,255,255,0.1);}
+
+/* INLINE MENU */
+.imenu{display:none;flex-direction:column;gap:5px;margin-top:7px;padding-top:7px;border-top:1px solid var(--br);}
+.imenu.open{display:flex;}
+.imenu-row{display:flex;gap:5px;}
+.ibtn{flex:1;padding:6px 0;border-radius:7px;font-family:'Poppins',sans-serif;font-size:11px;font-weight:600;border:1px solid var(--br);cursor:pointer;text-align:center;}
+.ibtn-edit{background:rgba(143,160,189,0.12);color:var(--tm);}
+.ibtn-pin{background:rgba(212,165,55,0.12);color:var(--go);}
+.ibtn-del{background:rgba(209,112,104,0.12);color:var(--er);}
+.ibtn-copy-all{background:rgba(95,174,141,0.12);color:var(--ok);}
+
+/* ADD BUTTONS */
+.add-field-btn{width:100%;padding:8px 0;border-radius:9px;border:1px dashed rgba(212,165,55,0.35);background:transparent;color:var(--td);font-family:'Poppins',sans-serif;font-size:11.5px;font-weight:600;cursor:pointer;margin-bottom:7px;}
+.add-group-btn{width:100%;padding:9px 0;border-radius:9px;border:1px dashed rgba(212,165,55,0.35);background:transparent;color:var(--go);font-family:'Poppins',sans-serif;font-size:11.5px;font-weight:600;cursor:pointer;margin-top:4px;margin-bottom:7px;}
+
+/* FAB */
+.fab-row{position:fixed;bottom:20px;right:18px;display:flex;flex-direction:column;gap:8px;align-items:flex-end;z-index:40;}
+.fab{width:48px;height:48px;border-radius:50%;background:var(--go);color:var(--nd);font-size:22px;font-weight:700;border:none;box-shadow:0 5px 18px rgba(212,165,55,0.38);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.fab-sm{width:38px;height:38px;font-size:16px;background:var(--nm);color:var(--gs);border:1px solid var(--br);box-shadow:0 3px 12px rgba(0,0,0,0.3);}
+
+/* OVERLAY / SHEET */
+.ov{position:fixed;inset:0;background:rgba(5,12,24,0.8);display:none;align-items:flex-end;justify-content:center;z-index:50;}
+.ov.open{display:flex;}
+.sheet{background:var(--nm);border-radius:18px 18px 0 0;width:100%;max-width:500px;max-height:85vh;overflow-y:auto;padding:20px 18px 28px;border-top:1px solid var(--br);}
+.sh-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--ow);margin-bottom:14px;}
+.fld{margin-bottom:12px;}
+.fld label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--td);margin-bottom:5px;font-weight:600;}
+.fld input,.fld textarea,.fld select{width:100%;background:var(--nd);border:1px solid var(--br);color:var(--ow);font-family:'Poppins',sans-serif;font-size:13.5px;padding:10px 12px;border-radius:8px;outline:none;}
+.fld input:focus,.fld textarea:focus{border-color:var(--go);}
+.fld textarea{resize:vertical;min-height:80px;}
+.sh-actions{display:flex;gap:8px;margin-top:14px;}
+.sbtn{flex:1;padding:12px 0;border-radius:9px;font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:600;border:none;cursor:pointer;}
+.sbtn-p{background:var(--go);color:var(--nd);}
+.sbtn-g{background:transparent;border:1px solid var(--br);color:var(--tm);}
+.sbtn-d{background:rgba(209,112,104,0.15);border:1px solid rgba(209,112,104,0.3);color:var(--er);}
+
+/* CONFIRM */
+.conf{background:var(--nd);border:1px solid rgba(209,112,104,0.3);border-radius:10px;padding:14px;margin-top:10px;display:none;}
+.conf.open{display:block;}
+.conf p{font-size:13px;color:var(--tm);margin-bottom:10px;line-height:1.4;}
+
+/* EMPTY */
+.empty{text-align:center;padding:30px 20px;color:var(--td);}
+.empty-t{font-family:'Playfair Display',serif;font-size:15px;color:var(--tm);margin-bottom:5px;}
+.empty-s{font-size:11.5px;}
+
+/* RESET BANNER */
+.reset-wrap{padding:0 18px;margin-top:10px;}
+.reset-btn{width:100%;padding:8px 0;border-radius:8px;border:1px solid rgba(209,112,104,0.2);background:transparent;color:rgba(209,112,104,0.6);font-family:'Poppins',sans-serif;font-size:11px;font-weight:600;cursor:pointer;}
+
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--go);color:var(--nd);font-size:12.5px;font-weight:600;padding:8px 18px;border-radius:25px;opacity:0;transition:all .22s ease;pointer-events:none;z-index:60;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* SEARCH RESULT */
+.search-active .fcard{display:none;}
+.search-active .fcard.match{display:block;}
+.search-active .ghdr{display:none;}
+.search-active .ghdr.match{display:block;}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-eye">Israel Bruno dos Anjos Silva</div>
+  <div class="hdr-title">Banco Curricular</div>
+  <div class="hdr-sub">Toque em Copiar → Cole no formulário da plataforma</div>
+  <div class="hdr-stats">
+    <div class="hdr-stat"><div class="hdr-stat-n" id="statFields">0</div><div class="hdr-stat-l">Campos</div></div>
+    <div class="hdr-stat"><div class="hdr-stat-n" id="statPinned">0</div><div class="hdr-stat-l">Favoritos</div></div>
+    <div class="hdr-stat"><div class="hdr-stat-n" id="statCopies">0</div><div class="hdr-stat-l">Copiados hoje</div></div>
+  </div>
+</div>
+<div class="hz"></div>
+
+<div class="rc-wrap" id="rcWrap" style="display:none">
+  <div class="rc-label">Copiados recentemente</div>
+  <div class="rc-row" id="rcRow"></div>
+</div>
+
+<div class="sw"><input class="si" id="searchInput" placeholder="Buscar... (ex: SAP, Wilson Sons, CBSP)"></div>
+
+<div class="tabs" id="tabBar"></div>
+<div id="sections"></div>
+
+<div class="reset-wrap">
+  <button class="reset-btn" id="resetBtn">↺ Restaurar dados originais</button>
+</div>
+
+<!-- MODAL -->
+<div class="ov" id="overlay">
+  <div class="sheet">
+    <div class="sh-title" id="shTitle">Editar campo</div>
+    <div id="shBody"></div>
+    <div class="sh-actions" id="shActions"></div>
+    <div class="conf" id="conf">
+      <p id="confMsg"></p>
+      <div style="display:flex;gap:8px">
+        <button class="sbtn sbtn-g" id="confNo">Cancelar</button>
+        <button class="sbtn sbtn-d" id="confYes">Excluir</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────
+//  DEFAULTS
+// ─────────────────────────────────────────────
+const DEF = {
+  sections:[
+  {id:'fav',title:'⭐ Favoritos',type:'flat',tip:'Campos que você marcou como favoritos aparecem aqui para acesso rápido.',fields:[]},
+  {id:'dados',title:'Dados Pessoais',type:'flat',tip:'Use nos primeiros campos do Workday, Gupy e demais plataformas.',fields:[
+    {id:'d1',label:'Nome completo',value:'Israel Bruno dos Anjos Silva',pinned:false},
+    {id:'d2',label:'Primeiro nome',value:'Israel Bruno',pinned:false},
+    {id:'d3',label:'Sobrenome',value:'dos Anjos Silva',pinned:false},
+    {id:'d4',label:'E-mail',value:'israelbas064@gmail.com',pinned:true},
+    {id:'d5',label:'Telefone (nacional)',value:'(22) 99790-1023',pinned:true},
+    {id:'d6',label:'Telefone alternativo',value:'(71) 99146-8446',pinned:false},
+    {id:'d7',label:'Telefone (internacional)',value:'+55 22 99790-1023',pinned:false},
+    {id:'d8',label:'Cidade',value:'Macaé',pinned:false},
+    {id:'d9',label:'Estado',value:'Rio de Janeiro',pinned:false},
+    {id:'d10',label:'Estado (sigla)',value:'RJ',pinned:false},
+    {id:'d11',label:'País',value:'Brasil',pinned:false},
+    {id:'d12',label:'País (inglês)',value:'Brazil',pinned:false},
+    {id:'d13',label:'LinkedIn',value:'https://www.linkedin.com/in/israel-silva-388544374',pinned:true},
+    {id:'d14',label:'Data de nascimento',value:'12/05/1999',pinned:false},
+    {id:'d15',label:'CNH',value:'A/B',pinned:false},
+    {id:'d16',label:'Disponibilidade',value:'Imediata — qualquer regime de escala (14x14, 28x28)',pinned:false},
+  ]},
+  {id:'resumos',title:'Resumos',type:'flat',tip:'Cole no campo "Cover Letter", "Resumo" ou "Sobre você" da plataforma.',fields:[
+    {id:'r1',label:'Curto PT — Almoxarife (até 500 car.)',value:'Profissional de logística com experiência em almoxarifado, controle de materiais e suprimentos. Certificações offshore completas: CBSP, THUET OPITO, MCIA, NR-37, NR-11/34, NR-33 e NR-35. Base em Macaé-RJ. Disponibilidade imediata.',pinned:false},
+    {id:'r2',label:'Curto PT — Roustabout (até 500 car.)',value:'Profissional operacional com experiência em movimentação de cargas, housekeeping e recebimento de materiais. Certificações offshore completas: CBSP, THUET OPITO, MCIA, NR-37, NR-11/34, NR-33 e NR-35. Base em Macaé-RJ. Embarque imediato.',pinned:false},
+    {id:'r3',label:'Longo PT — Almoxarife',value:'Profissional de logística e controle de materiais com mais de 4 anos de experiência comprovada em almoxarifado, gestão de suprimentos, recebimento, conferência, armazenagem e controle de inventário em operações de alto volume e ritmo contínuo. Experiência com ERP SAP, Power BI e Excel para controle operacional e relatórios gerenciais. Certificações offshore completas e válidas para embarque imediato: CBSP, THUET OPITO, MCIA, NR-37, NR-11/NR-34, NR-33 e NR-35. Atuo com foco rigoroso em SMS/HSE. Base em Macaé-RJ, disponibilidade imediata para qualquer regime de escala.',pinned:false},
+    {id:'r4',label:'Longo PT — Roustabout / Homem de Área',value:'Profissional operacional com experiência comprovada em movimentação manual de cargas, recebimento de materiais, armazenagem e housekeeping em ambientes de operação contínua e alta demanda. Atuo com foco absoluto em segurança, uso correto de EPIs e respeito irrestrito a procedimentos operacionais. Certificações ativas para embarque imediato: NR-11/NR-34, CBSP, THUET OPITO e MCIA. Base em Macaé-RJ, disponibilidade imediata.',pinned:false},
+    {id:'r5',label:'Summary EN — Warehouse / Storekeeper',value:'Logistics and materials control professional with 4+ years of proven experience in warehouse operations, supply chain management, receiving, inspection, storage and inventory control. Proficient in SAP ERP, Power BI and Excel. Full offshore certification package: CBSP (NORMAM-104), THUET OPITO, MCIA/ALPH, NR-37, NR-11/NR-34, NR-33 and NR-35. Based in Macaé-RJ — immediate availability for any rotation schedule.',pinned:false},
+    {id:'r6',label:'Summary EN — Roustabout / Deck Crew',value:'Offshore operations professional with hands-on experience in manual cargo handling, material receiving, storage, inventory control and area organization (housekeeping). Full offshore certification package: CBSP (NORMAM-104), THUET OPITO, MCIA/ALPH, NR-37, NR-11/NR-34, NR-33 and NR-35. Committed to rigorous SMS/HSE standards. Based in Macaé-RJ — immediate availability.',pinned:false},
+  ]},
+  {id:'exp',title:'Experiências',type:'grouped',tip:'Cadastre cada empresa separadamente na plataforma. Cole a descrição completa no campo de atividades.',groups:[
+    {id:'e1',title:'Certo Saúde',subtitle:'Comprador',meta:'Jan/2025 — Atual · Salvador, BA',fields:[
+      {id:'e1f1',label:'Job Title / Cargo',value:'Buyer / Procurement Analyst',pinned:false},
+      {id:'e1f2',label:'Cargo PT',value:'Comprador',pinned:false},
+      {id:'e1f3',label:'Empresa',value:'Certo Saúde',pinned:false},
+      {id:'e1f4',label:'Localização',value:'Salvador, Bahia, Brasil',pinned:false},
+      {id:'e1f5',label:'Data de início',value:'Janeiro 2025 · January 2025',pinned:false},
+      {id:'e1f6',label:'Data de término',value:'Presente · Present',pinned:false},
+      {id:'e1f7',label:'Descrição PT',value:'Gestão do ciclo completo de suprimentos: levantamento de demanda, cotação com múltiplos fornecedores, negociação de condições comerciais, emissão de ordens de compra e acompanhamento logístico de entregas, garantindo abastecimento contínuo da operação. Controle de estoque e análise de demanda para reposição programada, reduzindo rupturas operacionais e otimizando o nível de inventário. Organização e manutenção da área de armazenagem (housekeeping). Elaboração de relatórios gerenciais com Excel e Power BI. Todas as atividades executadas com foco rigoroso em SMS/HSE.',pinned:false},
+      {id:'e1f8',label:'Description EN',value:'Full procurement cycle management: demand assessment, multi-supplier quotation, commercial negotiation, purchase order issuance and inbound logistics tracking, ensuring continuous operation supply. Inventory control and demand analysis for scheduled replenishment. Storage area organization (housekeeping) maintenance. Managerial reporting using Excel and Power BI. All activities performed with strict SMS/HSE focus.',pinned:false},
+    ]},
+    {id:'e2',title:'Certo Saúde',subtitle:'Analista Administrativo',meta:'Mar/2024 — Dez/2024 · Salvador, BA',fields:[
+      {id:'e2f1',label:'Job Title / Cargo',value:'Administrative Analyst / Supply Chain',pinned:false},
+      {id:'e2f2',label:'Cargo PT',value:'Analista Administrativo',pinned:false},
+      {id:'e2f3',label:'Empresa',value:'Certo Saúde',pinned:false},
+      {id:'e2f4',label:'Localização',value:'Salvador, Bahia, Brasil',pinned:false},
+      {id:'e2f5',label:'Data de início',value:'Março 2024 · March 2024',pinned:false},
+      {id:'e2f6',label:'Data de término',value:'Dezembro 2024 · December 2024',pinned:false},
+      {id:'e2f7',label:'Descrição PT',value:'Suporte direto à gestão de suprimentos e logística, assegurando rastreabilidade e acurácia do estoque. Gerenciamento de inventário, controle de insumos e administração de rotinas da cadeia de suprimentos. Elaboração de relatórios gerenciais e acompanhamento de métricas operacionais com Power BI. Coordenação de equipes operacionais e suporte ao controle financeiro da unidade.',pinned:false},
+      {id:'e2f8',label:'Description EN',value:'Direct support to supply chain and logistics management, ensuring stock traceability and inventory accuracy. Practical inventory management, input control and supply chain routine administration. Operational metrics reporting and KPI tracking using Power BI. Team coordination and financial control support.',pinned:false},
+    ]},
+    {id:'e3',title:'Gonzalez Alimentos (Padaria Confiança)',subtitle:'Assistente Administrativo',meta:'Out/2023 — Mar/2024 · Salvador, BA',fields:[
+      {id:'e3f1',label:'Job Title / Cargo',value:'Administrative Assistant / Operational Support',pinned:false},
+      {id:'e3f2',label:'Cargo PT',value:'Assistente Administrativo',pinned:false},
+      {id:'e3f3',label:'Empresa',value:'Gonzalez Alimentos Ltda (Padaria Confiança)',pinned:false},
+      {id:'e3f4',label:'Localização',value:'Salvador, Bahia, Brasil',pinned:false},
+      {id:'e3f5',label:'Data de início',value:'Outubro 2023 · October 2023',pinned:false},
+      {id:'e3f6',label:'Data de término',value:'Março 2024 · March 2024',pinned:false},
+      {id:'e3f7',label:'Descrição PT',value:'Movimentação manual de cargas e suprimentos pesados para abastecimento contínuo da linha de produção, com rigoroso cumprimento de procedimentos de segurança e uso correto de EPIs. Manutenção de housekeeping da área de armazenagem. Recebimento e conferência de volumes e cargas de fornecedores. Controle de estoque, gestão de notas fiscais e suporte administrativo operacional.',pinned:false},
+      {id:'e3f8',label:'Description EN',value:'Manual cargo handling and heavy supplies movement for continuous production line supply, ensuring strict compliance with safety procedures and correct PPE use. Area housekeeping maintenance. Receiving and checking supplier loads. Stock control, fiscal note management and operational administrative support.',pinned:false},
+    ]},
+    {id:'e4',title:'Farmácia Supra Popular',subtitle:'Assistente Administrativo',meta:'Out/2021 — Out/2023 · Salvador, BA',fields:[
+      {id:'e4f1',label:'Job Title / Cargo',value:'Administrative Assistant / Warehouse',pinned:false},
+      {id:'e4f2',label:'Cargo PT',value:'Assistente Administrativo',pinned:false},
+      {id:'e4f3',label:'Empresa',value:'Farmácia Supra Popular',pinned:false},
+      {id:'e4f4',label:'Localização',value:'Salvador, Bahia, Brasil',pinned:false},
+      {id:'e4f5',label:'Data de início',value:'Outubro 2021 · October 2021',pinned:false},
+      {id:'e4f6',label:'Data de término',value:'Outubro 2023 · October 2023',pinned:false},
+      {id:'e4f7',label:'Descrição PT',value:'Rotinas completas de almoxarifado: recebimento, conferência e armazenagem sistemática de materiais, assegurando identificação correta e acurácia do inventário. Organização de área com housekeeping para reduzir tempo de localização de itens e eliminar rupturas. Controle de estoque, métricas operacionais, gestão de notas fiscais e apoio ao setor financeiro e de RH.',pinned:false},
+      {id:'e4f8',label:'Description EN',value:'Complete warehouse routines: material receiving, checking and systematic storage, ensuring correct identification and inventory accuracy. Stock area organization with housekeeping techniques. Inventory control with operational metrics reporting, fiscal note management. Financial and HR administrative support.',pinned:false},
+    ]},
+    {id:'e5',title:'Wilson Sons Serviços Marítimos',subtitle:'Jovem Aprendiz Administrativo',meta:'Out/2019 — Set/2021 · Salvador, BA',fields:[
+      {id:'e5f1',label:'Job Title / Cargo',value:'Administrative Apprentice — Maritime Sector',pinned:false},
+      {id:'e5f2',label:'Cargo PT',value:'Jovem Aprendiz Administrativo / Financeiro',pinned:false},
+      {id:'e5f3',label:'Empresa',value:'Wilson Sons Serviços Marítimos Ltda',pinned:false},
+      {id:'e5f4',label:'Localização',value:'Salvador, Bahia, Brasil',pinned:false},
+      {id:'e5f5',label:'Data de início',value:'Outubro 2019 · October 2019',pinned:false},
+      {id:'e5f6',label:'Data de término',value:'Setembro 2021 · September 2021',pinned:false},
+      {id:'e5f7',label:'Descrição PT',value:'Suporte administrativo e financeiro em empresa de serviços marítimos e portuários, com operação de ERP SAP para controle de notas fiscais e gestão de demandas internas. Alimentação de planilhas de indicadores (Excel), arquivamento de documentação técnica e suporte à logística da base operacional. Vivência com a cultura HSE e a dinâmica de operações navais.',pinned:false},
+      {id:'e5f8',label:'Description EN',value:'Administrative and logistics support in a major Brazilian maritime services company, operating SAP ERP for fiscal document control and internal demand management. Operational indicator spreadsheet maintenance, technical compliance document filing and logistics chain support. Developed HSE culture awareness and operational discipline applied to naval operations support.',pinned:false},
+    ]},
+  ]},
+  {id:'certs',title:'Certificações',type:'grouped',tip:'Cadastre cada certificação individualmente na plataforma.',groups:[
+    {id:'c1',title:'THUET OPITO',subtitle:'RelyOn Nutec (Brasil)',meta:'Mai/2026 — Válido até Mai/2030',fields:[
+      {id:'c1f1',label:'Nome PT',value:'THUET — Treinamento de Escape de Helicóptero Submerso em Águas Tropicais',pinned:false},
+      {id:'c1f2',label:'Nome EN',value:'Tropical Helicopter Underwater Escape Training (T-HUET) — OPITO',pinned:false},
+      {id:'c1f3',label:'Instituição',value:'RelyOn Nutec (Brasil)',pinned:false},
+      {id:'c1f4',label:'Data de emissão',value:'Maio 2026 · May 2026',pinned:false},
+      {id:'c1f5',label:'Validade',value:'Maio 2030 · May 2030',pinned:false},
+      {id:'c1f6',label:'ID / Número',value:'97335195180526682572',pinned:false},
+    ]},
+    {id:'c2',title:'CBSP — NORMAM-104',subtitle:'West Group Treinamentos Industriais',meta:'Mai/2026 — Válido até Mai/2031',fields:[
+      {id:'c2f1',label:'Nome PT',value:'CBSP — Curso Básico de Segurança de Plataforma (NORMAM-104) · 40h',pinned:false},
+      {id:'c2f2',label:'Nome EN',value:'CBSP — Basic Platform Safety Course (NORMAM-104)',pinned:false},
+      {id:'c2f3',label:'Instituição',value:'West Group Treinamentos Industriais',pinned:false},
+      {id:'c2f4',label:'Data de emissão',value:'Maio 2026 · May 2026',pinned:false},
+      {id:'c2f5',label:'Validade',value:'Maio 2031 · May 2031',pinned:false},
+      {id:'c2f6',label:'ID / Número',value:'347587',pinned:false},
+    ]},
+    {id:'c3',title:'MCIA / ALPH — NORMAM-104',subtitle:'West Group Treinamentos Industriais',meta:'Mai/2026 — Válido até Mai/2028',fields:[
+      {id:'c3f1',label:'Nome PT',value:'MCIA — Manobra e Combate a Incêndio de Aviação / ALPH (NORMAM-104) · 40h',pinned:false},
+      {id:'c3f2',label:'Nome EN',value:'MCIA/ALPH — Aviation Firefighting Maneuver and Combat (NORMAM-104)',pinned:false},
+      {id:'c3f3',label:'Instituição',value:'West Group Treinamentos Industriais',pinned:false},
+      {id:'c3f4',label:'Data de emissão',value:'Maio 2026 · May 2026',pinned:false},
+      {id:'c3f5',label:'Validade',value:'Maio 2028 · May 2028',pinned:false},
+      {id:'c3f6',label:'ID / Número',value:'347591',pinned:false},
+    ]},
+    {id:'c4',title:'NR-37',subtitle:'ITES Engenharia',meta:'Mai/2026 — Válido até Mai/2031',fields:[
+      {id:'c4f1',label:'Nome PT',value:'NR-37 — Segurança e Saúde em Plataformas de Petróleo — 1º Embarque · 8h',pinned:false},
+      {id:'c4f2',label:'Nome EN',value:'NR-37 — Occupational Safety and Health on Oil Platforms',pinned:false},
+      {id:'c4f3',label:'Instituição',value:'ITES Engenharia',pinned:false},
+      {id:'c4f4',label:'Data de emissão',value:'Maio 2026 · May 2026',pinned:false},
+      {id:'c4f5',label:'Validade',value:'Maio 2031 · May 2031',pinned:false},
+    ]},
+    {id:'c5',title:'NR-11 / NR-34',subtitle:'ITES Engenharia',meta:'Mai/2026 — Válido até Mai/2028',fields:[
+      {id:'c5f1',label:'Nome PT',value:'NR-11 / NR-34 — Movimentação de Cargas e Operações Navais · 40h',pinned:false},
+      {id:'c5f2',label:'Nome EN',value:'NR-11/NR-34 — Cargo Handling and Naval Operations',pinned:false},
+      {id:'c5f3',label:'Instituição',value:'ITES Engenharia',pinned:false},
+      {id:'c5f4',label:'Data de emissão',value:'Maio 2026 · May 2026',pinned:false},
+      {id:'c5f5',label:'Validade',value:'Maio 2028 · May 2028',pinned:false},
+    ]},
+    {id:'c6',title:'NR-33',subtitle:'ITES Engenharia',meta:'Abr/2026 — Válido até Abr/2027',fields:[
+      {id:'c6f1',label:'Nome PT',value:'NR-33 — Segurança em Trabalhos em Espaços Confinados · 16h',pinned:false},
+      {id:'c6f2',label:'Nome EN',value:'NR-33 — Confined Space Safety',pinned:false},
+      {id:'c6f3',label:'Instituição',value:'ITES Engenharia',pinned:false},
+      {id:'c6f4',label:'Data de emissão',value:'Abril 2026 · April 2026',pinned:false},
+      {id:'c6f5',label:'Validade',value:'Abril 2027 · April 2027',pinned:false},
+    ]},
+    {id:'c7',title:'NR-35',subtitle:'ITES Engenharia',meta:'Abr/2026 — Válido até Abr/2028',fields:[
+      {id:'c7f1',label:'Nome PT',value:'NR-35 — Segurança em Trabalho em Altura · 16h',pinned:false},
+      {id:'c7f2',label:'Nome EN',value:'NR-35 — Work at Height Safety',pinned:false},
+      {id:'c7f3',label:'Instituição',value:'ITES Engenharia',pinned:false},
+      {id:'c7f4',label:'Data de emissão',value:'Abril 2026 · April 2026',pinned:false},
+      {id:'c7f5',label:'Validade',value:'Abril 2028 · April 2028',pinned:false},
+    ]},
+  ]},
+  {id:'form',title:'Formação',type:'grouped',tip:'Cadastre cada curso separadamente na plataforma.',groups:[
+    {id:'f1',title:'Colégio Técnico Global',subtitle:'Técnico em Segurança e Saúde do Trabalho',meta:'Dez/2024 — Mai/2026 (Em andamento)',fields:[
+      {id:'f1f1',label:'Instituição',value:'Colégio Técnico Global',pinned:false},
+      {id:'f1f2',label:'Grau / Degree',value:'Ensino Técnico · Technical Certificate',pinned:false},
+      {id:'f1f3',label:'Área / Field of Study',value:'Técnico em Segurança e Saúde do Trabalho · Occupational Health and Safety',pinned:false},
+      {id:'f1f4',label:'Data de início',value:'Dezembro 2024 · December 2024',pinned:false},
+      {id:'f1f5',label:'Data de término',value:'Maio 2026 · May 2026 (Em andamento · In Progress)',pinned:false},
+    ]},
+    {id:'f2',title:'UniJorge',subtitle:'Tecnólogo em Logística',meta:'Fev/2024 — Em andamento',fields:[
+      {id:'f2f1',label:'Instituição',value:'UniJorge — Centro Universitário Jorge Amado',pinned:false},
+      {id:'f2f2',label:'Grau / Degree',value:"Superior Tecnológico · Associate's Degree",pinned:false},
+      {id:'f2f3',label:'Área / Field of Study',value:'Logística · Logistics Management',pinned:false},
+      {id:'f2f4',label:'Data de início',value:'Fevereiro 2024 · February 2024',pinned:false},
+      {id:'f2f5',label:'Data de término',value:'Em andamento · In Progress',pinned:false},
+    ]},
+    {id:'f3',title:'CEEP Luiz Pinto de Carvalho',subtitle:'Técnico em Logística',meta:'Mar/2019 — Nov/2020 (Concluído)',fields:[
+      {id:'f3f1',label:'Instituição',value:'CEEP Luiz Pinto de Carvalho',pinned:false},
+      {id:'f3f2',label:'Grau / Degree',value:'Ensino Técnico · Technical Certificate',pinned:false},
+      {id:'f3f3',label:'Área / Field of Study',value:'Logística · Logistics',pinned:false},
+      {id:'f3f4',label:'Data de início',value:'Março 2019 · March 2019',pinned:false},
+      {id:'f3f5',label:'Data de término',value:'Novembro 2020 · November 2020 (Concluído · Completed)',pinned:false},
+    ]},
+  ]},
+  {id:'skills',title:'Skills',type:'flat',tip:'Use no campo "Habilidades", "Skills" ou "Competências" da plataforma.',fields:[
+    {id:'sk1',label:'Offshore e Operacional (bloco completo)',value:'Almoxarifado Offshore · Gestão de Suprimentos · Controle de Estoque · Controle de Inventário · Recebimento e Conferência · Armazenagem · Housekeeping Operacional · Movimentação Manual de Cargas · Expedição de Materiais · Organização de Área · Operações Navais · SMS / HSE · Uso e Inspeção de EPIs · Trabalho em Altura · Espaços Confinados · Cargo Handling · Warehouse Operations',pinned:false},
+    {id:'sk2',label:'Sistemas e Tecnologia',value:'SAP ERP · Microsoft Excel (Intermediário) · Microsoft Power BI · Office 365 · Tabelas Dinâmicas · Dashboards · Relatórios Gerenciais · Análise de Dados',pinned:false},
+    {id:'sk3',label:'Compras e Supply Chain',value:'Gestão de Compras · Supply Chain · Ordens de Compra · Negociação · Notas Fiscais · Procurement · Purchase Orders · Supplier Negotiation',pinned:false},
+    {id:'sk4',label:'Comportamentais',value:'Atenção a Detalhes · Organização · Disciplina Operacional · Trabalho em Equipe · Foco em Segurança · Cumprimento de Prazos · Proatividade · Melhoria Contínua · Resiliência · Adaptabilidade',pinned:false},
+    {id:'sk5',label:'Idiomas / Languages',value:'Português — Nativo / Portuguese — Native\nInglês — Básico a Intermediário / English — Basic to Intermediate',pinned:false},
+  ]},
+  {id:'perguntas',title:'Perguntas',type:'flat',tip:'Respostas prontas para perguntas frequentes nas etapas de candidatura.',fields:[
+    {id:'p1',label:'Autorização para trabalhar no Brasil?',value:'Sim · Yes',pinned:false},
+    {id:'p2',label:'Disponível para relocação?',value:'Sim, tenho base em Macaé-RJ. · Yes, I am based in Macaé-RJ.',pinned:false},
+    {id:'p3',label:'Disponível para offshore / embarque?',value:'Sim, disponibilidade imediata para qualquer regime de escala. · Yes, immediately available for any rotation schedule.',pinned:false},
+    {id:'p4',label:'Tem CBSP válido?',value:'Sim, CBSP válido até Maio/2031 — West Group Treinamentos Industriais. · Yes, valid CBSP until May/2031.',pinned:false},
+    {id:'p5',label:'Tem THUET/HUET válido?',value:'Sim, T-HUET OPITO válido até Maio/2030 — RelyOn Nutec Brasil. · Yes, valid T-HUET OPITO until May/2030.',pinned:false},
+    {id:'p6',label:'Tem experiência offshore embarcada?',value:'Não tenho experiência embarcada, porém possuo todas as certificações obrigatórias ativas, mais de 4 anos de experiência em almoxarifado e controle de materiais, e base em Macaé. Estou pronto para embarcar.',pinned:false},
+    {id:'p7',label:'Pretensão salarial — Almoxarife Offshore',value:'A definir com base no pacote completo (salário base + diária de embarque + benefícios). Estou alinhado ao mercado para a função.',pinned:false},
+    {id:'p8',label:'Pretensão salarial — Roustabout / Homem de Área',value:'A definir com base no pacote completo. Estou alinhado ao mercado para a função.',pinned:false},
+    {id:'p9',label:'Por que quer trabalhar em offshore?',value:'Escolhi o setor offshore de forma planejada. Me certifiquei com CBSP, THUET OPITO, MCIA e todas as NRs operacionais antes de me candidatar. Tenho base em Macaé, disponibilidade imediata e quero aplicar minha experiência em controle de materiais em um ambiente que exija excelência operacional.',pinned:false},
+    {id:'p10',label:'Conhecimento em SAP?',value:'Sim, operei ERP SAP na Wilson Sons Serviços Marítimos para controle de notas fiscais e gestão de demandas internas.',pinned:false},
+    {id:'p11',label:'Conhece módulo SAP MM (Materiais)?',value:'Tenho conhecimento básico do módulo de materiais e estou disposto a aprofundar o treinamento específico para o sistema da empresa.',pinned:false},
+    {id:'p12',label:'Conhece inglês?',value:'Inglês básico a intermediário, em desenvolvimento ativo para uso profissional.',pinned:false},
+  ]},
+]};
+
+// ─────────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────────
+let data = null;
+let recentlyCopied = [];
+let copiesToday = 0;
+let todayKey = new Date().toDateString();
+let openMenuId = null;
+let shMode = null; // 'edit-field','add-field','edit-group','add-group'
+let shContext = null; // {secId, groupId, fieldId}
+
+// ─────────────────────────────────────────────
+//  STORAGE
+// ─────────────────────────────────────────────
+async function loadData(){
+  try{
+    const r = await window.storage.get('curric-data-v2');
+    data = r ? JSON.parse(r.value) : deepClone(DEF);
+  }catch(e){ data = deepClone(DEF); }
+  try{
+    const r2 = await window.storage.get('curric-rc');
+    recentlyCopied = r2 ? JSON.parse(r2.value) : [];
+  }catch(e){ recentlyCopied=[]; }
+  try{
+    const r3 = await window.storage.get('curric-copies');
+    const c = r3 ? JSON.parse(r3.value) : {};
+    copiesToday = (c.date===todayKey) ? c.count : 0;
+  }catch(e){ copiesToday=0; }
+}
+async function saveData(){ try{ await window.storage.set('curric-data-v2', JSON.stringify(data)); }catch(e){} }
+async function saveRC(){ try{ await window.storage.set('curric-rc', JSON.stringify(recentlyCopied)); }catch(e){} }
+async function saveCopies(){ try{ await window.storage.set('curric-copies', JSON.stringify({date:todayKey,count:copiesToday})); }catch(e){} }
+
+function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
+function uid(){ return '_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
+function esc(s){ const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+
+// ─────────────────────────────────────────────
+//  FIND HELPERS
+// ─────────────────────────────────────────────
+function findSec(id){ return data.sections.find(s=>s.id===id); }
+function findField(secId, fieldId, groupId){
+  const sec=findSec(secId);
+  if(!sec) return null;
+  if(sec.type==='flat') return sec.fields.find(f=>f.id===fieldId);
+  if(groupId){
+    const g=sec.groups.find(g=>g.id===groupId);
+    return g ? g.fields.find(f=>f.id===fieldId) : null;
+  }
+  return null;
+}
+function getAllPinnedFields(){
+  let pins=[];
+  data.sections.forEach(s=>{
+    if(s.id==='fav') return;
+    if(s.type==='flat') s.fields.filter(f=>f.pinned).forEach(f=>pins.push({...f,_sec:s.id}));
+    if(s.type==='grouped') s.groups.forEach(g=>g.fields.filter(f=>f.pinned).forEach(f=>pins.push({...f,_sec:s.id,_grp:g.id})));
+  });
+  return pins;
+}
+function countAllFields(){
+  let n=0;
+  data.sections.forEach(s=>{
+    if(s.id==='fav') return;
+    if(s.type==='flat') n+=s.fields.length;
+    if(s.type==='grouped') s.groups.forEach(g=>n+=g.fields.length);
+  });
+  return n;
+}
+
+// ─────────────────────────────────────────────
+//  RENDER
+// ─────────────────────────────────────────────
+function renderAll(){
+  renderTabs();
+  renderSections();
+  renderStats();
+  renderRC();
+}
+
+function renderTabs(){
+  const bar=document.getElementById('tabBar');
+  bar.innerHTML = data.sections.map((s,i)=>`
+    <div class="tab${i===0?'  active':''}" data-tab="${s.id}">${s.title}</div>
+  `).join('');
+  bar.querySelectorAll('.tab').forEach(t=>{
+    t.addEventListener('click',()=>{
+      bar.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      document.querySelectorAll('.sec').forEach(x=>x.classList.remove('active'));
+      document.getElementById('sec-'+t.dataset.tab)?.classList.add('active');
+      closeAllMenus();
+    });
+  });
+}
+
+function renderSections(){
+  const wrap=document.getElementById('sections');
+  wrap.innerHTML = data.sections.map((s,i)=>{
+    let inner='';
+    if(s.id==='fav'){
+      const pins=getAllPinnedFields();
+      if(pins.length===0) inner=`<div class="empty"><div class="empty-t">Nenhum favorito ainda</div><div class="empty-s">Toque em ⋯ em qualquer campo e escolha "Favorito".</div></div>`;
+      else inner=pins.map(f=>fieldCard(f,{secId:f._sec,groupId:f._grp,fromFav:true})).join('');
+    } else if(s.type==='flat'){
+      inner = s.fields.map(f=>fieldCard(f,{secId:s.id})).join('');
+      inner += `<button class="add-field-btn" data-action="add-field" data-sec="${s.id}">+ Adicionar campo</button>`;
+    } else if(s.type==='grouped'){
+      inner = s.groups.map(g=>{
+        let ghtml=`<div class="ghdr" data-gid="${g.id}">
+          <div class="ghdr-info">
+            <div class="gtitle">${esc(g.title)}</div>
+            ${g.subtitle?`<div class="gsub">${esc(g.subtitle)}</div>`:''}
+            ${g.meta?`<div class="gmeta">${esc(g.meta)}</div>`:''}
+          </div>
+          <div class="ghdr-actions">
+            <button class="mbtn" data-action="copy-group" data-sec="${s.id}" data-grp="${g.id}" title="Copiar tudo">⎘</button>
+            <button class="mbtn" data-action="menu-group" data-sec="${s.id}" data-grp="${g.id}">⋯</button>
+          </div>
+        </div>
+        <div class="imenu" id="gmenu-${g.id}">
+          <div class="imenu-row">
+            <button class="ibtn ibtn-edit" data-action="edit-group" data-sec="${s.id}" data-grp="${g.id}">Editar título</button>
+            <button class="ibtn ibtn-edit" data-action="add-field" data-sec="${s.id}" data-grp="${g.id}">+ Campo</button>
+          </div>
+          <div class="imenu-row">
+            <button class="ibtn ibtn-del" data-action="del-group" data-sec="${s.id}" data-grp="${g.id}">Excluir grupo</button>
+          </div>
+        </div>`;
+        ghtml += g.fields.map(f=>fieldCard(f,{secId:s.id,groupId:g.id})).join('');
+        return ghtml;
+      }).join('<div style="height:8px"></div>');
+      const gt = s.id==='certs'?'Certificação':s.id==='form'?'Formação':'Empresa';
+      inner += `<button class="add-group-btn" data-action="add-group" data-sec="${s.id}">+ Adicionar ${gt}</button>`;
+    }
+    return `<div class="sec${i===0?' active':''}" id="sec-${s.id}">
+      <div style="height:14px"></div>
+      ${s.tip?`<div class="tip">${esc(s.tip)}</div>`:''}
+      ${inner}
+    </div>`;
+  }).join('');
+
+  // delegate all actions
+  wrap.addEventListener('click', handleAction);
+}
+
+function fieldCard(f, ctx){
+  const chars = f.value ? f.value.length : 0;
+  const menuId = `fmenu-${f.id}${ctx.fromFav?'-fav':''}`;
+  return `<div class="fcard${f.pinned?' pinned':''}" id="fc-${f.id}${ctx.fromFav?'-fav':''}">
+    <div class="fcard-top">
+      <div class="fcard-left">
+        <div class="flabel">${f.pinned?'<span class="pin-star">⭐</span>':''}${esc(f.label)}</div>
+        <div class="fval">${esc(f.value)}</div>
+      </div>
+      <button class="mbtn" data-action="menu-field" data-sec="${ctx.secId}" data-grp="${ctx.groupId||''}" data-fid="${f.id}" data-menuid="${menuId}">⋯</button>
+    </div>
+    <div class="fcard-btns">
+      <button class="cbtn" data-action="copy" data-value="${encodeURIComponent(f.value)}" data-label="${encodeURIComponent(f.label)}">Copiar</button>
+      <span class="fchars">${chars} car.</span>
+    </div>
+    <div class="imenu" id="${menuId}">
+      <div class="imenu-row">
+        <button class="ibtn ibtn-edit" data-action="edit-field" data-sec="${ctx.secId}" data-grp="${ctx.groupId||''}" data-fid="${f.id}">Editar</button>
+        <button class="ibtn ibtn-pin" data-action="pin-field" data-sec="${ctx.secId}" data-grp="${ctx.groupId||''}" data-fid="${f.id}">${f.pinned?'★ Desfavoritar':'☆ Favoritar'}</button>
+      </div>
+      <div class="imenu-row">
+        <button class="ibtn ibtn-del" data-action="del-field" data-sec="${ctx.secId}" data-grp="${ctx.groupId||''}" data-fid="${f.id}">Excluir</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─────────────────────────────────────────────
+//  HANDLE ACTIONS
+// ─────────────────────────────────────────────
+function handleAction(e){
+  const btn = e.target.closest('[data-action]');
+  if(!btn) return;
+  const a=btn.dataset.action, sec=btn.dataset.sec, grp=btn.dataset.grp||null, fid=btn.dataset.fid;
+
+  if(a==='copy'){
+    doCopy(decodeURIComponent(btn.dataset.value), decodeURIComponent(btn.dataset.label), btn);
+    return;
+  }
+  if(a==='menu-field'){
+    const mid=btn.dataset.menuid;
+    const menu=document.getElementById(mid);
+    if(!menu) return;
+    const wasOpen=menu.classList.contains('open');
+    closeAllMenus();
+    if(!wasOpen) menu.classList.add('open');
+    return;
+  }
+  if(a==='menu-group'){
+    const mid=`gmenu-${grp}`;
+    const menu=document.getElementById(mid);
+    if(!menu) return;
+    const wasOpen=menu.classList.contains('open');
+    closeAllMenus();
+    if(!wasOpen) menu.classList.add('open');
+    return;
+  }
+  if(a==='copy-group'){
+    const s=findSec(sec);
+    const g=s?.groups?.find(x=>x.id===grp);
+    if(!g) return;
+    const text=[`${g.title}${g.subtitle?' — '+g.subtitle:''}${g.meta?' ('+g.meta+')':''}`,...g.fields.map(f=>`${f.label}: ${f.value}`)].join('\n');
+    doCopy(text,g.title+' (completo)',btn);
+    return;
+  }
+  closeAllMenus();
+
+  if(a==='edit-field') openEditField(sec,grp,fid);
+  else if(a==='del-field') openDelField(sec,grp,fid);
+  else if(a==='pin-field') doPin(sec,grp,fid);
+  else if(a==='add-field') openAddField(sec,grp);
+  else if(a==='edit-group') openEditGroup(sec,grp);
+  else if(a==='del-group') openDelGroup(sec,grp);
+  else if(a==='add-group') openAddGroup(sec);
+}
+
+function closeAllMenus(){
+  document.querySelectorAll('.imenu.open').forEach(m=>m.classList.remove('open'));
+}
+
+// ─────────────────────────────────────────────
+//  COPY
+// ─────────────────────────────────────────────
+async function doCopy(text, label, btn){
+  try{ await navigator.clipboard.writeText(text); } catch(e){
+    const ta=document.createElement('textarea');
+    ta.value=text; ta.style.cssText='position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+  }
+  if(btn){ btn.textContent='✓ Copiado!'; btn.classList.add('copied'); setTimeout(()=>{btn.textContent='Copiar';btn.classList.remove('copied');},1800); }
+  showToast(`Copiado — ${text.length} caracteres`);
+  copiesToday++;
+  recentlyCopied.unshift({label,value:text});
+  if(recentlyCopied.length>5) recentlyCopied.pop();
+  renderRC(); renderStats();
+  await saveCopies(); await saveRC();
+}
+
+// ─────────────────────────────────────────────
+//  PIN
+// ─────────────────────────────────────────────
+async function doPin(secId,groupId,fieldId){
+  const f=findField(secId,fieldId,groupId);
+  if(!f) return;
+  f.pinned=!f.pinned;
+  await saveData();
+  renderAll();
+  showToast(f.pinned?'Adicionado aos favoritos':'Removido dos favoritos');
+}
+
+// ─────────────────────────────────────────────
+//  MODAL HELPERS
+// ─────────────────────────────────────────────
+function openOverlay(){ document.getElementById('overlay').classList.add('open'); document.getElementById('conf').classList.remove('open'); }
+function closeOverlay(){ document.getElementById('overlay').classList.remove('open'); }
+
+function setModal(title, bodyHtml, actions){
+  document.getElementById('shTitle').textContent=title;
+  document.getElementById('shBody').innerHTML=bodyHtml;
+  document.getElementById('shActions').innerHTML=actions;
+  openOverlay();
+}
+
+// ─────────────────────────────────────────────
+//  EDIT FIELD
+// ─────────────────────────────────────────────
+function openEditField(secId,groupId,fieldId){
+  const f=findField(secId,fieldId,groupId);
+  if(!f) return;
+  shContext={secId,groupId,fieldId};shMode='edit-field';
+  setModal('Editar campo',
+    `<div class="fld"><label>Nome do campo</label><input id="sh_label" value="${esc(f.label)}"></div>
+     <div class="fld"><label>Conteúdo</label><textarea id="sh_value">${esc(f.value)}</textarea></div>`,
+    `<button class="sbtn sbtn-g" id="shCancel">Cancelar</button><button class="sbtn sbtn-p" id="shSave">Salvar</button>`
+  );
+  bindModalBtns(saveEditField);
+}
+async function saveEditField(){
+  const f=findField(shContext.secId,shContext.fieldId,shContext.groupId);
+  if(!f) return;
+  f.label=document.getElementById('sh_label').value.trim()||f.label;
+  f.value=document.getElementById('sh_value').value;
+  await saveData(); closeOverlay(); renderAll(); showToast('Campo atualizado');
+}
+
+// ─────────────────────────────────────────────
+//  DEL FIELD
+// ─────────────────────────────────────────────
+function openDelField(secId,groupId,fieldId){
+  const f=findField(secId,fieldId,groupId);
+  if(!f) return;
+  shContext={secId,groupId,fieldId};shMode='del-field';
+  setModal('Excluir campo','',
+    `<button class="sbtn sbtn-g" id="shCancel">Cancelar</button>`
+  );
+  document.getElementById('confMsg').textContent=`Excluir o campo "${f.label}"? Essa ação não pode ser desfeita.`;
+  document.getElementById('conf').classList.add('open');
+  document.getElementById('confYes').onclick=doDelField;
+  document.getElementById('confNo').onclick=closeOverlay;
+  document.getElementById('shCancel').onclick=closeOverlay;
+}
+async function doDelField(){
+  const {secId,groupId,fieldId}=shContext;
+  const sec=findSec(secId);
+  if(!sec) return;
+  if(sec.type==='flat') sec.fields=sec.fields.filter(f=>f.id!==fieldId);
+  else{ const g=sec.groups.find(g=>g.id===groupId); if(g) g.fields=g.fields.filter(f=>f.id!==fieldId); }
+  await saveData(); closeOverlay(); renderAll(); showToast('Campo excluído');
+}
+
+// ─────────────────────────────────────────────
+//  ADD FIELD
+// ─────────────────────────────────────────────
+function openAddField(secId,groupId){
+  shContext={secId,groupId};shMode='add-field';
+  setModal('Adicionar campo',
+    `<div class="fld"><label>Nome do campo</label><input id="sh_label" placeholder="Ex: Cargo PT"></div>
+     <div class="fld"><label>Conteúdo</label><textarea id="sh_value" placeholder="Cole o texto aqui..."></textarea></div>`,
+    `<button class="sbtn sbtn-g" id="shCancel">Cancelar</button><button class="sbtn sbtn-p" id="shSave">Adicionar</button>`
+  );
+  bindModalBtns(saveAddField);
+}
+async function saveAddField(){
+  const label=document.getElementById('sh_label').value.trim();
+  const value=document.getElementById('sh_value').value;
+  if(!label) return;
+  const {secId,groupId}=shContext;
+  const sec=findSec(secId);
+  if(!sec) return;
+  const nf={id:uid(),label,value,pinned:false};
+  if(sec.type==='flat') sec.fields.push(nf);
+  else{ const g=sec.groups.find(g=>g.id===groupId); if(g) g.fields.push(nf); }
+  await saveData(); closeOverlay(); renderAll(); showToast('Campo adicionado');
+}
+
+// ─────────────────────────────────────────────
+//  EDIT GROUP
+// ─────────────────────────────────────────────
+function openEditGroup(secId,groupId){
+  const sec=findSec(secId);
+  const g=sec?.groups?.find(x=>x.id===groupId);
+  if(!g) return;
+  shContext={secId,groupId};shMode='edit-group';
+  setModal('Editar grupo',
+    `<div class="fld"><label>Título (empresa/certificação)</label><input id="sh_gtitle" value="${esc(g.title)}"></div>
+     <div class="fld"><label>Subtítulo (cargo/curso)</label><input id="sh_gsub" value="${esc(g.subtitle||'')}"></div>
+     <div class="fld"><label>Período / detalhes</label><input id="sh_gmeta" value="${esc(g.meta||'')}"></div>`,
+    `<button class="sbtn sbtn-g" id="shCancel">Cancelar</button><button class="sbtn sbtn-p" id="shSave">Salvar</button>`
+  );
+  bindModalBtns(saveEditGroup);
+}
+async function saveEditGroup(){
+  const sec=findSec(shContext.secId);
+  const g=sec?.groups?.find(x=>x.id===shContext.groupId);
+  if(!g) return;
+  g.title=document.getElementById('sh_gtitle').value.trim()||g.title;
+  g.subtitle=document.getElementById('sh_gsub').value.trim();
+  g.meta=document.getElementById('sh_gmeta').value.trim();
+  await saveData(); closeOverlay(); renderAll(); showToast('Grupo atualizado');
+}
+
+// ─────────────────────────────────────────────
+//  DEL GROUP
+// ─────────────────────────────────────────────
+function openDelGroup(secId,groupId){
+  const sec=findSec(secId);
+  const g=sec?.groups?.find(x=>x.id===groupId);
+  if(!g) return;
+  shContext={secId,groupId};shMode='del-group';
+  setModal('Excluir grupo','',`<button class="sbtn sbtn-g" id="shCancel">Cancelar</button>`);
+  document.getElementById('confMsg').textContent=`Excluir "${g.title}" e todos os seus campos? Essa ação não pode ser desfeita.`;
+  document.getElementById('conf').classList.add('open');
+  document.getElementById('confYes').onclick=doDelGroup;
+  document.getElementById('confNo').onclick=closeOverlay;
+  document.getElementById('shCancel').onclick=closeOverlay;
+}
+async function doDelGroup(){
+  const sec=findSec(shContext.secId);
+  if(!sec) return;
+  sec.groups=sec.groups.filter(g=>g.id!==shContext.groupId);
+  await saveData(); closeOverlay(); renderAll(); showToast('Grupo excluído');
+}
+
+// ─────────────────────────────────────────────
+//  ADD GROUP
+// ─────────────────────────────────────────────
+function openAddGroup(secId){
+  shContext={secId};shMode='add-group';
+  const lbl=secId==='certs'?'certificação':secId==='form'?'formação':'empresa';
+  setModal(`Adicionar ${lbl}`,
+    `<div class="fld"><label>Título (${lbl})</label><input id="sh_gtitle" placeholder="Ex: Engeman"></div>
+     <div class="fld"><label>Subtítulo (cargo/curso)</label><input id="sh_gsub" placeholder="Ex: Auxiliar de Plataforma"></div>
+     <div class="fld"><label>Período / detalhes</label><input id="sh_gmeta" placeholder="Ex: Jan/2025 — Atual · Macaé, RJ"></div>`,
+    `<button class="sbtn sbtn-g" id="shCancel">Cancelar</button><button class="sbtn sbtn-p" id="shSave">Criar grupo</button>`
+  );
+  bindModalBtns(saveAddGroup);
+}
+async function saveAddGroup(){
+  const title=document.getElementById('sh_gtitle').value.trim();
+  if(!title) return;
+  const sec=findSec(shContext.secId);
+  if(!sec) return;
+  sec.groups.push({id:uid(),title,subtitle:document.getElementById('sh_gsub').value.trim(),meta:document.getElementById('sh_gmeta').value.trim(),fields:[]});
+  await saveData(); closeOverlay(); renderAll(); showToast('Grupo criado — adicione campos agora');
+}
+
+// ─────────────────────────────────────────────
+//  BIND MODAL
+// ─────────────────────────────────────────────
+function bindModalBtns(saveFn){
+  document.getElementById('shCancel').onclick=closeOverlay;
+  document.getElementById('shSave').onclick=saveFn;
+}
+
+// close on overlay backdrop
+document.getElementById('overlay').addEventListener('click',e=>{ if(e.target.id==='overlay') closeOverlay(); });
+
+// ─────────────────────────────────────────────
+//  STATS + RC
+// ─────────────────────────────────────────────
+function renderStats(){
+  document.getElementById('statFields').textContent=countAllFields();
+  document.getElementById('statPinned').textContent=getAllPinnedFields().length;
+  document.getElementById('statCopies').textContent=copiesToday;
+}
+function renderRC(){
+  const wrap=document.getElementById('rcWrap');
+  const row=document.getElementById('rcRow');
+  if(recentlyCopied.length===0){wrap.style.display='none';return;}
+  wrap.style.display='block';
+  row.innerHTML=recentlyCopied.map((r,i)=>`
+    <div class="rc-chip" data-rc="${i}" title="${esc(r.label)}">${esc(r.label)}</div>
+  `).join('');
+  row.querySelectorAll('.rc-chip').forEach(c=>{
+    c.addEventListener('click',()=>{
+      const rc=recentlyCopied[+c.dataset.rc];
+      if(rc) doCopy(rc.value,rc.label,null);
+    });
+  });
+}
+
+// ─────────────────────────────────────────────
+//  SEARCH
+// ─────────────────────────────────────────────
+document.getElementById('searchInput').addEventListener('input', function(){
+  const q=this.value.toLowerCase().trim();
+  const secs=document.getElementById('sections');
+  if(!q){ secs.classList.remove('search-active'); document.querySelectorAll('.fcard,.ghdr').forEach(e=>e.classList.remove('match')); return; }
+  secs.classList.add('search-active');
+  document.querySelectorAll('.fcard').forEach(c=>{
+    c.classList.toggle('match', c.textContent.toLowerCase().includes(q));
+  });
+  document.querySelectorAll('.ghdr').forEach(c=>{
+    c.classList.toggle('match', c.textContent.toLowerCase().includes(q));
+  });
+  // show all section tabs
+  document.querySelectorAll('.sec').forEach(s=>s.style.display='block');
+});
+
+// ─────────────────────────────────────────────
+//  RESET
+// ─────────────────────────────────────────────
+document.getElementById('resetBtn').addEventListener('click', async()=>{
+  if(!confirm('Restaurar todos os dados originais? Suas edições serão perdidas.')) return;
+  data=deepClone(DEF);
+  await saveData();
+  renderAll();
+  showToast('Dados restaurados');
+});
+
+// ─────────────────────────────────────────────
+//  TOAST
+// ─────────────────────────────────────────────
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+// ─────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────
+(async()=>{
+  await loadData();
+  renderAll();
+})();
+</script>
+</body>
+</html>
